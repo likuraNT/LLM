@@ -1,0 +1,42 @@
+name: Build CarTube APK
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'CarTubeAndroid/**'
+      - '.github/workflows/cartube-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install SDK 35
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+      - name: Install Gradle 8.11.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Compile signed debug APK
+        working-directory: CarTubeAndroid
+        run: gradle --no-daemon --stacktrace :app:assembleDebug
+      - name: Export APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CarTube-debug-APK
+          path: CarTubeAndroid/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
