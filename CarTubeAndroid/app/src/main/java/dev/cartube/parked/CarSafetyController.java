@@ -12,11 +12,11 @@ final class CarSafetyController {
     private final Listener callback;
     private Car car;
     private CarUxRestrictionsManager manager;
-    private final CarUxRestrictionsManager.OnUxRestrictionsChangedListener listener =
-        r -> callback.onRestricted(r == null || r.isRequiresDistractionOptimization());
+    private final CarUxRestrictionsManager.OnUxRestrictionsChangedListener listener;
     CarSafetyController(Context context, Listener callback) {
         this.context = context;
         this.callback = callback;
+        this.listener = r -> this.callback.onRestricted(r == null || r.isRequiresDistractionOptimization());
     }
     void start() {
         callback.onRestricted(true);
